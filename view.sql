@@ -1,4 +1,4 @@
-CREATE VIEW AllTables AS
+CREATE OR REPLACE VIEW AllTables AS
     SELECT * 
     FROM 
         TEDTalk
