@@ -17,10 +17,6 @@ csv_file = open('ted_main.csv', errors='ignore')
 csv_reader = csv_DictReader(csv_file)
 line_num = 1
 
-# у запиті можуть міститися амперсанди, які викликають непередбачувану поведінку
-# щоб нормально вставити амперсанди, слід виконати наступну команду
-"""query = 'SET DEFINE OFF'
-cursor.execute(query)"""
 
 # деякі атрибути, що визначені як PK, можуть повторюватися
 # вставлення рядків з такими атрибутами у таблицю викличе помилку
@@ -38,8 +34,6 @@ for table in tables:
 # оброблюємо csv-файл
 try:
     for line in csv_reader:
-
-        
 
         # зчитуємо атрибути, "підправляємо" дані
         description = line['description'].strip()
