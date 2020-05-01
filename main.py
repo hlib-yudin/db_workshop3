@@ -2,8 +2,8 @@ import cx_Oracle
 import plotly.offline as py
 import plotly.graph_objs as go
 
-username = 'SYSTEM'
-password = 'oracle'
+username = 'Yudin'
+password = 'yudin'
 databaseName = 'localhost/xe'
 
 connection = cx_Oracle.connect(username, password, databaseName)
@@ -14,30 +14,17 @@ cursor = connection.cursor()
 тривалість усіх їхніх виступів."""
 
 query = '''
--- крок 3 -- обрати топ-10    
-SELECT 
-    *
+SELECT *
 FROM (
-
-        -- крок 2 -- сам запит
-        SELECT 
+        SELECT
             person_name
-            , SUM(duration_sec) AS total_duration_sec
+            , SUM(duration_sec) as total_duration_sec
         FROM
-
-                    -- крок 1 -- позбутися купи дублікатів, які виникли при 
-                    -- JOIN-і всіх табличок
-                    (SELECT DISTINCT
-                        person_name
-                        , speech_name
-                        , duration_sec
-                    FROM
-                        AllTables)
-                 
+            PersonSpeechDuration
         GROUP BY person_name
-        ORDER BY total_duration_sec DESC
-) 
-WHERE ROWNUM <= 10'''
+        ORDER BY SUM(duration_sec) DESC
+        
+) WHERE ROWNUM <= 10'''
 
 cursor.execute(query)
 person_names = []
@@ -82,55 +69,26 @@ url_1 = py.plot(fig, filename='desktop/db/lab3/Спікер-загальна т�
 та відсоток виступів, у яких переважає цей рейтинг."""
 
 query = '''
---крок 4 -- LEFT JOIN з рейтингами
 SELECT 
     Rating.rating_name
-    , NVL(temp2.speech_count, 0) AS speech_count
-    --якщо необхідно порахувати у відсотках
-    --, NVL(ROUND(temp2.speech_count / temp3.total_speeches * 100, 2), 0) AS percentage
+    , NVL(speech_count, 0) AS speech_count
 FROM 
-    Rating 
+    -- об'єднуємо з Rating, бо в temp1 будуть присутні не всі рейтинги
+    Rating
     LEFT JOIN (
-            
-            --крок 3: обрати зі SpeechRating те, що отримали на кроці 2
-            SELECT 
-                SpeechRating.rating_name
-                ,COUNT(*) as speech_count
-            FROM (   
-                        --крок 2: виступ -- максимальне rating_value
-                        SELECT 
-                            speech_name
-                            ,MAX(rating_value) AS max_rating_value
-                        FROM (
-                        
-                                -- крок 1 -- позбутися дублікатів
-                                SELECT DISTINCT
-                                    speech_name
-                                    , rating_name
-                                    , rating_value
-                                    , event
-                                FROM AllTables)
-                                    
-                            
-                        WHERE
-                            event = 'TED2014'
-                        GROUP BY 
-                            speech_name
-                         
-            -- крок 3            
-            ) temp1 JOIN SpeechRating
-                ON SpeechRating.speech_name = temp1.speech_name
-                AND SpeechRating.rating_value = temp1.max_rating_value 
-                    
-            GROUP BY
-                SpeechRating.rating_name
-                
---крок 4                
-) temp2 
-    ON temp2.rating_name = Rating.rating_name
     
---якщо необхідно порахувати в відсотках
---, (SELECT COUNT(*) AS total_speeches FROM TEDTalk WHERE event = 'TED2014') temp3
+            -- рейтинг -- к-сть виступів, в яких переважає цей рейтинг
+            SELECT
+                e.primary_rating_name
+                , COUNT(e.speech_name) as speech_count
+            FROM
+                EventSpeechPrimaryRating e
+            WHERE 
+                event = 'TED2014'
+            GROUP BY
+                e.primary_rating_name
+            
+    ) temp1 ON Rating.rating_name = temp1.primary_rating_name
 '''
 
 cursor.execute(query)
@@ -155,14 +113,9 @@ query = '''
 SELECT
     EXTRACT(YEAR FROM film_date) AS year,
     SUM(views) AS total_views
-FROM (
-
-        -- крок 1 -- позбутись дублікатів
-        SELECT DISTINCT
-            speech_name
-            , film_date
-            , views
-        FROM AllTables)
+FROM 
+    TEDTalk JOIN Video
+        ON TEDTalk.url = Video.url
 
         
 GROUP BY EXTRACT(YEAR FROM film_date)
