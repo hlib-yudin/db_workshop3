@@ -30,4 +30,5 @@ try:
                 row = cursor.fetchone()
 
 finally:
+    cursor.close()
     connection.close()
