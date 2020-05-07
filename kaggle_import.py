@@ -4,6 +4,8 @@ from ast import literal_eval
 from datetime import datetime
 import cx_Oracle
 
+print('Будь ласка, закрийте ораклівський connection, інакше програма зависне!')
+
 # під'єднуємось до бази даних
 username = 'Yudin'
 password = 'yudin'
