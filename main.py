@@ -62,7 +62,7 @@ layout = go.Layout(
 
 fig = go.Figure(data=bar, layout=layout)
 
-url_1 = py.plot(fig, filename='desktop/db/lab3/Спікер-загальна тривалість.html')
+url_1 = py.plot(fig, filename='Спікер-загальна тривалість.html')
 
 """----------------------------------------------------------------------
 Запит 2 - для виступів з TED2014 вивести рейтинг (Funny, Inspiring, Beautiful...) 
@@ -103,7 +103,7 @@ while row:
     row = cursor.fetchone()
 
 pie = go.Pie(labels=rating_names, values=speech_count)
-url_2 = py.plot([pie], filename='desktop/db/lab3/Рейтинг-відсоток.html')
+url_2 = py.plot([pie], filename='Рейтинг-відсоток.html')
 
 """------------------------------------------------------------------------
 Запит 3 - вивести динаміку переглядів виступів на ted.com по роках (за всі роки)."""
@@ -137,7 +137,7 @@ scatter = go.Scatter(
     y=views,
     mode='lines+markers'
 )
-url_3 = py.plot([scatter], filename='desktop/db/lab3/Дата-перегляди.html')
+url_3 = py.plot([scatter], filename='Дата-перегляди.html')
 
 connection.close()
 
