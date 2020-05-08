@@ -5,6 +5,7 @@ from datetime import datetime
 import cx_Oracle
 
 print('Будь ласка, закрийте ораклівський connection, інакше програма зависне!')
+input('Натисніть Enter, щоб почати заповнювати таблиці: ')
 
 # під'єднуємось до бази даних
 username = 'Yudin'
